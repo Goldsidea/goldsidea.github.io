@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Frases Célebres">
+    <title>Perspectivas - La Ciudad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 30%, #003366 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 51, 102, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid rgba(0, 204, 204, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00cccc, #66ffff, #33ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 204, 204, 0.3);
+        }
+
+        .header h2 {
+            font-size: 1.8em;
+            color: #66ccff;
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .folder {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 204, 204, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .folder:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 204, 204, 0.2);
+            border-color: rgba(0, 204, 204, 0.6);
+        }
+
+        .folder-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+            text-align: center;
+        }
+
+        .folder-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .folder-description {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .folder-count {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 204, 204, 0.6);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .folder-content {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 51, 102, 0.6);
+            border-radius: 10px;
+            border-left: 4px solid #00cccc;
+        }
+
+        .folder-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(0, 204, 204, 0.5);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(0, 204, 204, 0.8);
+            background: rgba(0, 204, 204, 0.1);
+        }
+
+        .upload-button {
+            background: linear-gradient(45deg, #00cccc, #0099cc);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .upload-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 204, 204, 0.3);
+        }
+
+        .file-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #00cccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #ff6b6b;
+        }
+
+        .city-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: -1;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect width="1200" height="800" fill="%23003366"/><rect x="100" y="500" width="80" height="200" fill="%23004d99"/><rect x="200" y="450" width="60" height="250" fill="%230066cc"/><rect x="280" y="400" width="90" height="300" fill="%23004d99"/><rect x="400" y="480" width="70" height="220" fill="%230066cc"/><rect x="500" y="420" width="100" height="280" fill="%23004d99"/><rect x="650" y="460" width="80" height="240" fill="%230066cc"/><rect x="750" y="380" width="120" height="320" fill="%23004d99"/><rect x="900" y="440" width="90" height="260" fill="%230066cc"/><rect x="1020" y="490" width="70" height="210" fill="%23004d99"/></svg>') center/cover;
+        }
+
+        .folder.frases { --folder-color: #e67e22; }
+        .folder.documentos { --folder-color: #3498db; }
+        .folder.fotos { --folder-color: #e74c3c; }
+        .folder.enlaces { --folder-color: #f39c12; }
+        .folder.bitacora { --folder-color: #9b59b6; }
+        .folder.ciudad { --folder-color: #1abc9c; }
+
+        .folder:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .folder:hover:before {
+            left: 100%;
+        }
+
+        /* Estilos para la tabla de frases */
+        .frases-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .frases-form input, .frases-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .frases-form input[type="file"] {
+            background: rgba(0, 204, 204, 0.2);
+            color: white;
+        }
+
+        .frases-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .frases-table th {
+            background: rgba(0, 204, 204, 0.3);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .frases-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            vertical-align: top;
+        }
+
+        .frases-table tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .frase-text {
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.4;
+            max-width: 300px;
+        }
+
+        .frase-reference {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 200px;
+        }
+
+        .frase-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(0, 204, 204, 0.5);
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            background: #ff5252;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .folder-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .folder {
+                padding: 20px;
+            }
+
+            .frases-table {
+                font-size: 0.9em;
+            }
+
+            .frases-table th, .frases-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="city-background"></div>
+    
+    <header class="header">
+        <h1>Perspectivas</h1>
+        <h2>La Ciudad</h2>
+        <p>Donde cada punto de vista cuenta una historia diferente. Explora las múltiples perspectivas que convergen en nuestra ciudad digital.</p>
+    </header>
+
+    <div class="container">
+        <div class="folder-grid">
+            <div class="folder frases" onclick="toggleFolder('frases')">
+                <span class="folder-count">0</span>
+                <span class="folder-icon">📜</span>
+                <div class="folder-title">Frases Célebres</div>
+                <div class="folder-description">Sabiduría y reflexiones de grandes pensadores</div>
+            </div>
+
+            <div class="folder documentos" onclick="toggleFolder('documentos')">
+                <span class="folder-count">0</span>
+                <span class="folder-icon">📄</span>
+                <div class="folder-title">Documentos</div>
+                <div class="folder-description">PDFs, textos y archivos importantes</div>
+            </div>
+
+            <div class="folder fotos" onclick="toggleFolder('fotos')">
+                <span class="folder-count">0</span>
+                <span class="folder-icon">📸</span>
+                <div class="folder-title">Fotos</div>
+                <div class="folder-description">Imágenes y recuerdos visuales</div>
+            </div>
+
+            <div class="folder enlaces" onclick="toggleFolder('enlaces')">
+                <span class="folder-count">0</span>
+                <span class="folder-icon">🔗</span>
+                <div class="folder-title">Enlaces</div>
+                <div class="folder-description">Sitios web y recursos de interés</div>
+            </div>
+
+            <div class="folder bitacora" onclick="toggleFolder('bitacora')">
+                <span class="folder-count">0</span>
+                <span class="folder-icon">📝</span>
+                <div class="folder-title">Bitácora</div>
+                <div class="folder-description">Anotaciones y reflexiones personales</div>
+            </div>
+
+            <div class="folder ciudad" onclick="toggleFolder('ciudad')">
+                <span class="folder-count">0</span>
+                <span class="folder-icon">🏙️</span>
+                <div class="folder-title">La Ciudad</div>
+                <div class="folder-description">Perspectivas urbanas y sociales</div>
+            </div>
+        </div>
+
+        <!-- Contenido de carpetas -->
+        <div id="frases-content" class="folder-content">
+            <button class="close-btn" onclick="toggleFolder('frases')">&times;</button>
+            <h3>📜 Frases Célebres</h3>
+            <div class="frases-form">
+                <h4>Agregar Nueva Frase</h4>
+                <textarea id="frase-text" placeholder="Escribe la frase célebre aquí..." rows="3"></textarea>
+                <input type="text" id="frase-reference" placeholder="Referencia (autor, libro, ocasión, etc.)">
+                <input type="file" id="frase-photo" accept="image/*">
+                <button class="upload-button" onclick="addFrase()">Agregar Frase</button>
+            </div>
+            <table class="frases-table" id="frases-table">
+                <thead>
+                    <tr>
+                        <th>Frase</th>
+                        <th>Referencia</th>
+                        <th>Foto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="frases-tbody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="documentos-content" class="folder-content">
+            <button class="close-btn" onclick="toggleFolder('documentos')">&times;</button>
+            <h3>📄 Documentos</h3>
+            <div class="upload-area">
+                <p>Arrastra archivos PDF aquí o haz clic para seleccionar</p>
+                <input type="file" id="doc-upload" accept=".pdf,.doc,.docx,.txt" style="display: none;" onchange="handleFileUpload('documentos', this)">
+                <button class="upload-button" onclick="document.getElementById('doc-upload').click()">Subir Documento</button>
+            </div>
+            <ul id="documentos-list" class="file-list"></ul>
+        </div>
+
+        <div id="fotos-content" class="folder-content">
+            <button class="close-btn" onclick="toggleFolder('fotos')">&times;</button>
+            <h3>📸 Fotos</h3>
+            <div class="upload-area">
+                <p>Arrastra imágenes aquí o haz clic para seleccionar</p>
+                <input type="file" id="foto-upload" accept="image/*" multiple style="display: none;" onchange="handleFileUpload('fotos', this)">
+                <button class="upload-button" onclick="document.getElementById('foto-upload').click()">Subir Foto</button>
+            </div>
+            <ul id="fotos-list" class="file-list"></ul>
+        </div>
+
+        <div id="enlaces-content" class="folder-content">
+            <button class="close-btn" onclick="toggleFolder('enlaces')">&times;</button>
+            <h3>🔗 Enlaces</h3>
+            <div class="upload-area">
+                <p>Agrega enlaces de interés</p>
+                <input type="url" id="link-input" placeholder="https://ejemplo.com" style="padding: 10px; margin: 10px; border: none; border-radius: 5px; width: 300px;">
+                <input type="text" id="link-title" placeholder="Título del enlace" style="padding: 10px; margin: 10px; border: none; border-radius: 5px; width: 200px;">
+                <button class="upload-button" onclick="addLink()">Agregar Enlace</button>
+            </div>
+            <ul id="enlaces-list" class="file-list"></ul>
+        </div>
+
+        <div id="bitacora-content" class="folder-content">
+            <button class="close-btn" onclick="toggleFolder('bitacora')">&times;</button>
+            <h3>📝 Bitácora</h3>
+            <div class="upload-area">
+                <p>Escribe tus pensamientos y reflexiones</p>
+                <textarea id="note-input" placeholder="Escribe tu nota aquí..." style="width: 100%; height: 150px; padding: 15px; border: none; border-radius: 5px; margin: 10px 0; resize: vertical;"></textarea>
+                <button class="upload-button" onclick="addNote()">Agregar Nota</button>
+            </div>
+            <ul id="bitacora-list" class="file-list"></ul>
+        </div>
+
+        <div id="ciudad-content" class="folder-content">
+            <button class="close-btn" onclick="toggleFolder('ciudad')">&times;</button>
+            <h3>🏙️ La Ciudad</h3>
+            <div class="upload-area">
+                <p>Perspectivas sobre la vida urbana</p>
+                <textarea id="city-input" placeholder="Comparte tus perspectivas sobre la ciudad..." style="width: 100%; height: 150px; padding: 15px; border: none; border-radius: 5px; margin: 10px 0; resize: vertical;"></textarea>
+                <button class="upload-button" onclick="addCityNote()">Agregar Perspectiva</button>
+            </div>
+            <ul id="ciudad-list" class="file-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Almacenamiento local para los archivos
+        let storage = {
+            frases: [],
+            documentos: [],
+            fotos: [],
+            enlaces: [],
+            bitacora: [],
+            ciudad: []
+        };
+
+        function toggleFolder(folderId) {
+            const content = document.getElementById(folderId + '-content');
+            const isActive = content.classList.contains('active');
+            
+            // Cerrar todas las carpetas
+            document.querySelectorAll('.folder-content').forEach(folder => {
+                folder.classList.remove('active');
+            });
+            
+            // Abrir la carpeta seleccionada si no estaba activa
+            if (!isActive) {
+                content.classList.add('active');
+            }
+        }
+
+        function addFrase() {
+            const fraseText = document.getElementById('frase-text').value;
+            const fraseReference = document.getElementById('frase-reference').value;
+            const frasePhoto = document.getElementById('frase-photo').files[0];
+            
+            if (fraseText.trim() && fraseReference.trim()) {
+                const frase = {
+                    text: fraseText,
+                    reference: fraseReference,
+                    photo: null,
+                    date: new Date().toLocaleDateString()
+                };
+                
+                // Si hay foto, crear URL temporal
+                if (frasePhoto) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        frase.photo = e.target.result;
+                        storage.frases.push(frase);
+                        updateFrasesTable();
+                        updateFolderCount('frases');
+                    };
+                    reader.readAsDataURL(frasePhoto);
+                } else {
+                    storage.frases.push(frase);
+                    updateFrasesTable();
+                    updateFolderCount('frases');
+                }
+                
+                // Limpiar formulario
+                document.getElementById('frase-text').value = '';
+                document.getElementById('frase-reference').value = '';
+                document.getElementById('frase-photo').value = '';
+            }
+        }
+
+        function updateFrasesTable() {
+            const tbody = document.getElementById('frases-tbody');
+            tbody.innerHTML = '';
+            
+            storage.frases.forEach((frase, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="frase-text">"${frase.text}"</td>
+                    <td class="frase-reference">${frase.reference}</td>
+                    <td>
+                        ${frase.photo ? `<img src="${frase.photo}" alt="Foto" class="frase-photo">` : '📷'}
+                    </td>
+                    <td>
+                        <button class="delete-btn" onclick="removeFrase(${index})">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function removeFrase(index) {
+            storage.frases.splice(index, 1);
+            updateFrasesTable();
+            updateFolderCount('frases');
+        }
+
+        function handleFileUpload(category, input) {
+            const files = input.files;
+            for (let file of files) {
+                storage[category].push({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    date: new Date().toLocaleDateString()
+                });
+            }
+            updateFileList(category);
+            updateFolderCount(category);
+        }
+
+        function addLink() {
+            const url = document.getElementById('link-input').value;
+            const title = document.getElementById('link-title').value;
+            
+            if (url && title) {
+                storage.enlaces.push({
+                    title: title,
+                    url: url,
+                    date: new Date().toLocaleDateString()
+                });
+                
+                document.getElementById('link-input').value = '';
+                document.getElementById('link-title').value = '';
+                updateFileList('enlaces');
+                updateFolderCount('enlaces');
+            }
+        }
+
+        function addNote() {
+            const note = document.getElementById('note-input').value;
+            
+            if (note.trim()) {
+                storage.bitacora.push({
+                    content: note,
+                    date: new Date().toLocaleDateString(),
+                    preview: note.substring(0, 50) + (note.length > 50 ? '...' : '')
+                });
+                
+                document.getElementById('note-input').value = '';
+                updateFileList('bitacora');
+                updateFolderCount('bitacora');
+            }
+        }
+
+        function addCityNote() {
+            const note = document.getElementById('city-input').value;
+            
+            if (note.trim()) {
+                storage.ciudad.push({
+                    content: note,
+                    date: new Date().toLocaleDateString(),
+                    preview: note.substring(0, 50) + (note.length > 50 ? '...' : '')
+                });
+                
+                document.getElementById('city-input').value = '';
+                updateFileList('ciudad');
+                updateFolderCount('ciudad');
+            }
+        }
+
+        function updateFileList(category) {
+            const list = document.getElementById(category + '-list');
+            list.innerHTML = '';
+            
+            storage[category].forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                
+                let content = '';
+                if (category === 'enlaces') {
+                    content = `<a href="${item.url}" target="_blank" style="color: #00cccc; text-decoration: none;">${item.title}</a> - ${item.date}`;
+                } else if (category === 'bitacora' || category === 'ciudad') {
+                    content = `${item.preview} - ${item.date}`;
+                } else {
+                    content = `${item.name} - ${item.date}`;
+                }
+                
+                li.innerHTML = `
+                    <span>${content}</span>
+                    <button onclick="removeItem('${category}', ${index})" style="background: #ff6b6b; border: none; color: white; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Eliminar</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function removeItem(category, index) {
+            storage[category].splice(index, 1);
+            updateFileList(category);
+            updateFolderCount(category);
+        }
+
+        function updateFolderCount(category) {
+            const folder = document.querySelector(`.folder.${category}`);
+            const countElement = folder.querySelector('.folder-count');
+            countElement.textContent = storage[category].length;
+        }
+
+        // Efectos de drag and drop
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const uploadAreas = document.querySelectorAll('.upload-area');
+            uploadAreas.forEach(area => {
+                area.style.backgroundColor = '';
+            });
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            // Actualizar contadores iniciales
+            Object.keys(storage).forEach(category => {
+                updateFolderCount(category);
+            });
+        });
+    </script>
+</body>
+</html>
